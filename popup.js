@@ -65,11 +65,19 @@ function pauseMusic() {
 }
 
 function skipToNext() {
+    if (playlist.length === 0) {
+        alert("No songs in the queue.");
+        return;
+    }
     currentIndex = (currentIndex + 1) % playlist.length;
     playMusic();
 }
 
 function skipToPrevious() {
+    if (playlist.length === 0) {
+        alert("No songs in the queue.");
+        return;
+    }
     currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
     playMusic();
 }
@@ -92,14 +100,58 @@ function updateQueue() {
 
     playlist.forEach((song, index) => {
         const listItem = document.createElement("li");
-        listItem.textContent = `${index + 1}. ${song.title} - ${song.artist}`;
-        listItem.addEventListener("click", function () {
+        
+        // Create a container for the song text and delete button
+        const container = document.createElement("div");
+        container.style.display = "flex";
+        container.style.justifyContent = "space-between";
+        container.style.alignItems = "center";
+
+        // Create a span for the song text
+        const songText = document.createElement("span");
+        songText.textContent = `${index + 1}. ${song.title} - ${song.artist}`;
+        
+        // Create a delete button with a minus circle icon
+        const deleteButton = document.createElement("button");
+        deleteButton.style.fontSize = "10px"; // Make the button smaller
+        deleteButton.style.padding = "0 2px"; // Reduce padding for a smaller button
+        deleteButton.style.backgroundImage = "url('icons/delete-song.png')"; // Replace 'minus-circle-icon.png' with your actual icon path
+        deleteButton.style.backgroundRepeat = "no-repeat";
+        deleteButton.style.backgroundSize = "cover"; // Ensure the icon fits the button
+        deleteButton.style.width = "15px"; // Adjust width to fit the icon
+        deleteButton.style.height = "15px"; // Adjust height to fit the icon
+        deleteButton.style.border = "none"; // Remove button border
+        deleteButton.style.backgroundColor = "transparent";
+
+        // Add event listener to delete button
+        deleteButton.addEventListener("click", function(event) {
+            playlist.splice(index, 1); // Remove the song from the playlist
+            updateQueue(); // Update the queue display
+            // Update the current index if necessary
+            if (currentIndex >= playlist.length) {
+                currentIndex = playlist.length - 1;
+                if (currentIndex < 0) {
+                    currentIndex = 0;
+                }
+            }
+            updatePlaybackInfo(); // Update playback info if necessary
+        });
+
+        // Add event listener to play the song when clicking on the song text
+        songText.addEventListener("click", function () {
             currentIndex = index;
             playMusic();
         });
+
+        // Add both song text and delete button to the container
+        container.appendChild(songText);
+        container.appendChild(deleteButton);
+        listItem.appendChild(container);
         queueList.appendChild(listItem);
     });
 }
+
+
 
 async function convertYoutubeToMp3(url) {
     alert(`Processing: ${url}`);
