@@ -63,8 +63,6 @@ function applyEffects() {
 }
 
 // Handle messages from background.js
-
-
 chrome.runtime.onMessage.addListener((msg) => {
     if (msg.command === 'play') {
         if (msg.source !== currentSource) {

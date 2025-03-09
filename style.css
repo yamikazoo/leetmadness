@@ -162,7 +162,8 @@ body {
     padding: 0;
     flex: 1;
     overflow-y: auto;
-    max-height: 180px;}
+    max-height: 180px;
+}
 
 #queueList li {
     padding: 5px;
@@ -173,4 +174,18 @@ body {
 
 #queueList li:hover {
     background-color: #333;
+}
+
+.progress-container {
+  display: flex;
+  align-items: center;
+}
+
+#currentTime, #totalDuration {
+  font-size: 14px;
+  margin: 0 10px;
+}
+
+#progress {
+  width: 100%;
 }

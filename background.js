@@ -33,16 +33,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       audioSource = request.source;
       isPlaying = true;
       playAudio();
+    } else if (request.command === 'resume') {
+      isPlaying = true;
+      playAudio();
     } else if (request.command === 'pause') {
       isPlaying = false;
       pauseAudio();
     } else if (request.command === 'next') {
-        if (typeof initialised === 'undefined') {
-            initialised = true;
-            console.log("Received next command...")
-            chrome.runtime.sendMessage({ command: 'skipToNext' });
-        }
-        initialised = undefined;
+        console.log("Received next command...")
+        chrome.runtime.sendMessage({ command: 'skipToNext' });
     } else if (request.command === 'previous') {
       // Handle previous song logic here
       // Not implemented; never called.
@@ -62,6 +61,7 @@ chrome.runtime.onConnect.addListener((port) => {
 });
 
 async function playAudio() {
+  console.log('Preparing to play...');
   await setupOffscreenDocument();
   chrome.runtime.sendMessage({ command: 'play', source: audioSource });
   console.log('Sent play command to offscreen document');

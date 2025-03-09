@@ -9,6 +9,13 @@ let currentIndex = 0;
 let currentlyPlayingSource = null;
 let isPlaying = false;
 
+// Function to format time in seconds to MM:SS
+function formatTime(time) {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
 
 document.addEventListener('DOMContentLoaded', async function() {
     await loadCurrentSongIndex();
@@ -25,6 +32,17 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
 
     port.postMessage({ request: 'getState' });
+
+    // Get references to the HTML elements
+    const audioPlayer = document.getElementById('audioPlayer');
+    const totalDurationDisplay = document.getElementById('totalDuration');
+
+    // Set total duration display when metadata is loaded
+    audioPlayer.addEventListener('loadedmetadata', () => {
+    const duration = audioPlayer.duration;
+    totalDurationDisplay.textContent = formatTime(duration);
+    });
+
 
     const playButton = document.getElementById("playButton");
     if (playButton) {
@@ -302,6 +320,8 @@ function updateQueue() {
             songText.addEventListener("click", function () {
                 currentIndex = index;
                 chrome.runtime.sendMessage({ command: 'play', source: playlist[currentIndex].src });
+                currentlyPlayingSource = playlist[currentIndex].src;
+                updatePlaybackInfo();
             });
 
             container.appendChild(songText);
