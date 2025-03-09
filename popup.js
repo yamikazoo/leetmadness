@@ -83,3 +83,52 @@ function toggleIcon(isPlaying) {
         icon.className = "play-icon";
     }
 }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("Popup loaded, waiting for user input...");
+
+    // ✅ Event Listener for Converting YouTube URL to MP3
+    document.getElementById("convertButton").addEventListener("click", async () => {
+        const youtubeURL = document.getElementById("youtube-url").value;
+        if (!youtubeURL) {
+            alert("Please enter a valid YouTube URL.");
+            return;
+        }
+
+        const audioURL = await convertYouTubeToAudio(youtubeURL);
+        if (audioURL) {
+            localStorage.setItem("leetmadness_audio_url", audioURL);
+            alert("Audio ready! It will distort on failure.");
+        }
+    });
+
+    // ✅ Load saved YouTube audio if available
+    const savedAudio = localStorage.getItem("leetmadness_audio_url");
+    if (savedAudio) {
+        console.log("Loaded saved YouTube audio:", savedAudio);
+    }
+});
+
+/**
+ * 🎵 Convert YouTube Video to MP3 using an API
+ */
+async function convertYouTubeToAudio(youtubeURL) {
+    const apiKey = "7b69ef25a8msh370013627f22292p158d22jsn1829a5827683"; // Replace with your API Key
+    const apiURL = `https://your-api.com/convert?url=${encodeURIComponent(youtubeURL)}&format=mp3`;
+
+    try {
+        const response = await fetch(apiURL, {
+            headers: { "X-API-Key": apiKey }
+        });
+
+        const data = await response.json();
+        return data.audio_url; // The direct MP3 file link
+    } 
+    
+    catch (error) {
+        console.error("Error converting YouTube video:", error);
+        alert("Failed to convert YouTube video.");
+        return null;
+    }
+}
