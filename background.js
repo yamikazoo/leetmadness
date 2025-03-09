@@ -27,7 +27,9 @@ async function setupOffscreenDocument() {
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.command === 'play') {
+    if (request.command === 'seek') {
+        chrome.runtime.sendMessage({ command: 'seek', time: request.time });
+    } else if (request.command === 'play') {
       audioSource = request.source;
       isPlaying = true;
       playAudio();

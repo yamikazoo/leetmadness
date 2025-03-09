@@ -1,10 +1,12 @@
 // popup.js
 const defaultPlaylist = [
     { title: "Song 1", artist: "Artist 1", src: "songs/flamin.mp3" },
-    { title: "Song 2", artist: "Artist 2", src: "songs/song2.mp3" },
-    { title: "Song 3", artist: "Artist 3", src: "songs/song3.mp3" }
+    { title: "Song 2", artist: "Artist 2", src: "songs/audio.mp3" },
+    { title: "Song 3", artist: "Artist 3", src: "songs/moving-on-snoozybeats.mp3" }
 ];
 let currentIndex = 0;
+let currentlyPlayingSource = null;
+let isPlaying = false;
 
 
 document.addEventListener('DOMContentLoaded', async function() {
@@ -16,15 +18,9 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     const port = chrome.runtime.connect({ name: 'playbackState' });
     port.onMessage.addListener((message) => {
-        if (message.isPlaying) {
-            const icon = document.getElementById("icon");
-            icon.className = "pause-icon";
-            icon.innerHTML = '<div></div><div></div>'; 
-        } else {
-            const icon = document.getElementById("icon");
-            icon.className = "play-icon";
-            icon.innerHTML = ''; 
-        }
+        isPlaying = message.isPlaying;
+        // currentlyPlayingSource = message.currentSource || currentlyPlayingSource
+        updatePlayButtonIcon();
     });
 
     port.postMessage({ request: 'getState' });
@@ -32,16 +28,19 @@ document.addEventListener('DOMContentLoaded', async function() {
     const playButton = document.getElementById("playButton");
     if (playButton) {
         playButton.addEventListener("click", function () {
-            const icon = document.getElementById("icon");
-            if (icon.className === "play-icon") {
-                chrome.runtime.sendMessage({ command: 'play', source: playlist[currentIndex].src });
-                icon.className = "pause-icon";
-                icon.innerHTML = '<div></div><div></div>'; 
+            if (!isPlaying) {
+                if (currentlyPlayingSource !== playlist[currentIndex].src) {
+                    chrome.runtime.sendMessage({ command: 'play', source: playlist[currentIndex].src });
+                    currentlyPlayingSource = playlist[currentIndex].src;
+                } else {
+                    chrome.runtime.sendMessage({ command: 'resume' });
+                }
+                isPlaying = true;
             } else {
                 chrome.runtime.sendMessage({ command: 'pause' });
-                icon.className = "play-icon";
-                icon.innerHTML = ''; // Reset icon to play state
+                isPlaying = false;
             }
+            updatePlayButtonIcon();
         });
     } else {
         console.error("Element 'playButton' not found.");
@@ -107,6 +106,22 @@ document.addEventListener('DOMContentLoaded', async function() {
     } else {
         console.error("Element 'queueButton' not found.");
     }
+});
+
+function updatePlayButtonIcon() {
+    const icon = document.getElementById("icon");
+    if (isPlaying) {
+        icon.className = "pause-icon";
+        icon.innerHTML = '<div></div><div></div>';
+    } else {
+        icon.className = "play-icon";
+        icon.innerHTML = '';
+    }
+}
+
+document.getElementById("progress").addEventListener("input", function() {
+    const newTime = playlist[currentIndex].duration * (this.value / 100);
+    chrome.runtime.sendMessage({ command: 'seek', time: newTime });
 });
 
 async function loadCurrentSongIndex() {
@@ -202,6 +217,9 @@ function skipToNext() {
     currentIndex = (currentIndex + 1) % playlist.length;
     chrome.runtime.sendMessage({ command: 'play', source: playlist[currentIndex].src });
     updatePlaybackInfo();
+    const icon = document.getElementById("icon");
+    icon.className = "pause-icon";
+    icon.innerHTML = '<div></div><div></div>';
     saveCurrentSongIndex();
 }
 
@@ -213,6 +231,9 @@ function skipToPrevious() {
     currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
     chrome.runtime.sendMessage({ command: 'play', source: playlist[currentIndex].src });
     updatePlaybackInfo();
+    const icon = document.getElementById("icon");
+    icon.className = "pause-icon";
+    icon.innerHTML = '<div></div><div></div>';
     saveCurrentSongIndex();
 }
 
