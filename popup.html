@@ -4,125 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spotify Player</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 200px;
-            height: 120px;
-            background-color: #121212;
-            margin: 0;
-            padding: 10px;
-            color: white;
-            font-family: Arial, sans-serif;
-        }
-
-        .controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-top: 10px;
-        }
-
-        .button {
-            width: 40px;
-            height: 40px;
-            background-color: #1DB954; /* Spotify Green */
-            border: none;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        .button:hover {
-            background-color: #17a144;
-        }
-
-        #playButton {
-            width: 50px;
-            height: 50px;
-        }
-
-        /* Play icon (Triangle) */
-        .play-icon {
-            width: 0;
-            height: 0;
-            border-left: 14px solid white;
-            border-top: 8px solid transparent;
-            border-bottom: 8px solid transparent;
-            margin-left: 2px;
-        }
-
-        /* Pause icon (Two vertical bars) */
-        .pause-icon {
-            display: flex;
-            gap: 3px;
-        }
-
-        .pause-icon div {
-            width: 4px;
-            height: 14px;
-            background-color: white;
-        }
-
-        /* Previous and Next icons */
-        .prev-icon, .next-icon {
-            position: relative;
-            width: 12px;
-            height: 12px;
-        }
-
-        .prev-icon:before, .next-icon:before {
-            content: "";
-            position: absolute;
-            width: 0;
-            height: 0;
-            border-top: 6px solid transparent;
-            border-bottom: 6px solid transparent;
-        }
-
-        .prev-icon:after, .next-icon:after {
-            content: "";
-            position: absolute;
-            width: 2px;
-            height: 12px;
-            background-color: white;
-        }
-
-        .prev-icon:before {
-            border-right: 10px solid white;
-            left: 2px;
-        }
-
-        .prev-icon:after {
-            left: 2px;
-        }
-
-        .next-icon:before {
-            border-left: 10px solid white;
-            right: 2px;
-        }
-
-        .next-icon:after {
-            right: 2px;
-        }
-
-        .song-info {
-            font-size: 12px;
-            text-align: center;
-            margin-bottom: 10px;
-            max-width: 180px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="song-info" id="songInfo">
@@ -138,6 +20,14 @@
         <button id="nextButton" class="button">
             <div class="next-icon"></div>
         </button>
+    </div>
+    <div class="queue-container">
+        <div class="input-container">
+            <input type="text" id="videoUrl" placeholder="Paste YouTube link">
+            <button id="addSongButton">+</button>
+        </div>
+        <button id="queueButton">Show Queue</button>
+        <ul id="queueList"></ul>
     </div>
     <script src="popup.js"></script>
 </body>

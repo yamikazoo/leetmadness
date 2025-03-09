@@ -1,0 +1,176 @@
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 220px;
+    background-color: #121212;
+    margin: 0;
+    padding: 10px;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.button {
+    width: 40px;
+    height: 40px;
+    background-color: #1DB954; /* Spotify Green */
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.button:hover {
+    background-color: #17a144;
+}
+
+#playButton {
+    width: 50px;
+    height: 50px;
+}
+
+.play-icon {
+    width: 0;
+    height: 0;
+    border-left: 14px solid white;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    margin-left: 2px;
+}
+
+.pause-icon {
+    display: flex;
+    gap: 3px;
+}
+
+.pause-icon div {
+    width: 4px;
+    height: 14px;
+    background-color: white;
+}
+
+/* Icons for prev and next buttons */
+.prev-icon, .next-icon {
+    position: relative;
+    width: 16px;
+    height: 16px;
+}
+
+.prev-icon:before, .next-icon:before {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+}
+
+.prev-icon:after, .next-icon:after {
+    content: "";
+    position: absolute;
+    width: 3px;
+    height: 14px;
+    background-color: white;
+}
+
+.prev-icon:before {
+    border-right: 12px solid white;
+    left: 3px;
+}
+
+.prev-icon:after {
+    left: 0;
+}
+
+.next-icon:before {
+    border-left: 12px solid white;
+    right: 3px;
+}
+
+.next-icon:after {
+    right: 0;
+}
+
+.song-info {
+    font-size: 12px;
+    text-align: center;
+    margin-bottom: 10px;
+    max-width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.queue-container {
+    width: 100%;
+    margin-top: 10px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#videoUrl {
+    flex: 1;
+    padding: 5px;
+    border: none;
+    border-radius: 5px;
+}
+
+#addSongButton {
+    padding: 5px 10px;
+    background-color: #1DB954;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+}
+
+#queueButton {
+    margin-top: 5px;
+    width: 100%;
+    background-color: #282828;
+    border: none;
+    color: white;
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#queueList {
+    display: none;
+    margin-top: 5px;
+    width: 100%;
+    list-style: none;
+    padding: 0;
+    flex: 1;
+    overflow-y: auto;
+}
+
+#queueList li {
+    padding: 5px;
+    background-color: #1e1e1e;
+    margin-bottom: 2px;
+    cursor: pointer;
+}
+
+#queueList li:hover {
+    background-color: #333;
+}
