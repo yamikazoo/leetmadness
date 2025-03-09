@@ -2,66 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src * self blob: data: gap:; style-src * self 'unsafe-inline' blob: data: gap:; script-src * 'self' 'unsafe-eval' 'unsafe-inline' blob: data: gap:; object-src * 'self' blob: data: gap:; img-src * self 'unsafe-inline' blob: data: gap:; connect-src self * 'unsafe-inline' blob: data: gap:; frame-src * self blob: data: gap:;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spotify Player</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100px;
-            height: 100px;
-            background-color: white;
-            margin: 0;
-        }
-
-        .play-button {
-            width: 60px;
-            height: 60px;
-            background-color: #1DB954; /* Spotify Green */
-            border: none;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        .play-button:hover {
-            background-color: #17a144;
-        }
-
-        .play-icon, .pause-icon {
-            width: 0;
-            height: 0;
-        }
-
-        /* Play icon (Triangle) */
-        .play-icon {
-            border-left: 14px solid white;
-            border-top: 8px solid transparent;
-            border-bottom: 8px solid transparent;
-            margin-left: 2px;
-        }
-
-        /* Pause icon (Two vertical bars) */
-        .pause-icon {
-            display: flex;
-            gap: 3px;
-        }
-
-        .pause-icon div {
-            width: 4px;
-            height: 14px;
-            background-color: white;
-        }
-    </style>
+    <!-- ✅ Load the Spotify Web Playback SDK -->
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>  
+    
+    <link rel="stylesheet" href="popup.css">
 </head>
 <body>
     <button id="playButton" class="play-button">
         <div id="icon" class="play-icon"></div>
     </button>
+
     <script src="popup.js"></script>
 </body>
 </html>

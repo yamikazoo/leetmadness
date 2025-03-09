@@ -2,18 +2,16 @@
     "manifest_version": 3,
     "name": "LeetMadness",
     "version": "1.0",
-    "description": "TODO:",
-    "permissions": [
-      "activeTab"
-    ],
+    "description": "Plays calm music that distorts when you make an incorrect LeetCode submission.",
+    "permissions": ["activeTab", "storage"],
+    "host_permissions": ["https://api.spotify.com/*", "https://leetcode.com/*", "https://sdk.scdn.co/*"],
     "background": {
       "service_worker": "background.js"
     },
     "action": {
       "default_popup": "popup.html",
-      "default_icon": {
-        "16": "icons/icon-16.png"
-      }
+      "default_icon": {"16": "icons/icon-16.png"
+    }
     },
     "content_scripts": [
       {

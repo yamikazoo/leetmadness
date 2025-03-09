@@ -1,0 +1,68 @@
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 100px;
+    background-color: white;
+    margin: 0;
+}
+
+.play-button {
+    width: 60px;
+    height: 60px;
+    background-color: #1DB954; /* Spotify Green */
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.play-button:hover {
+    background-color: #17a144;
+}
+
+.play-icon, .pause-icon {
+    width: 0;
+    height: 0;
+}
+
+/* Play icon (Triangle) */
+.play-icon {
+    border-left: 14px solid white;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    margin-left: 2px;
+}
+
+/* Pause icon (Two vertical bars) */
+.pause-icon {
+    display: flex;
+    gap: 3px;
+}
+
+.pause-icon div {
+    width: 4px;
+    height: 14px;
+    background-color: white;
+}
+
+/* Spotify Login Button */
+.login-button {
+    background-color: #1DB954;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.3s ease;
+}
+
+.login-button:hover {
+    background-color: #17a144;
+}
