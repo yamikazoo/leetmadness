@@ -1,27 +1,30 @@
 {
-    "manifest_version": 3,
-    "name": "LeetMadness",
-    "version": "1.0",
-    "description": "TODO:",
-    "permissions": [
-      "activeTab",
-      "offscreen",
-      "tabs",
-      "storage"
-    ],
-    "background": {
-      "service_worker": "background.js"
-    },
-    "action": {
-      "default_popup": "popup.html",
-      "default_icon": {
-        "16": "icons/icon-16.png"
-      }
-    },
-    "content_scripts": [
-      {
-        "matches": ["<all_urls>"],
-        "js": ["content.js"]
-      }
-    ]
-  }
+  "manifest_version": 3,
+  "name": "LeetMadness",
+  "version": "1.0",
+  "description": "Plays calm music that distorts when you make an incorrect LeetCode submission.",
+  "permissions": [
+    "activeTab",
+    "offscreen",
+    "tabs",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://leetcode.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://leetcode.com/*"],
+      "js": ["errorDetector.js"]
+    }
+  ]
+}
