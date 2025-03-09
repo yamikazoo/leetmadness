@@ -1,8 +1,8 @@
 // popup.js
 const defaultPlaylist = [
-    { title: "Song 1", artist: "Artist 1", src: "songs/flamin.mp3" },
-    { title: "Song 2", artist: "Artist 2", src: "songs/audio.mp3" },
-    { title: "Song 3", artist: "Artist 3", src: "songs/moving-on-snoozybeats.mp3" }
+    { title: "Flamin", artist: "Unknown", src: "songs/flamin.mp3" },
+    { title: "Unknown", artist: "Unknown", src: "songs/audio.mp3" },
+    { title: "Moving On", artist: "SnoozyBeats", src: "songs/moving-on-snoozybeats.mp3" }
 ];
 let playlist = defaultPlaylist;
 let currentIndex = 0;
@@ -89,6 +89,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             const url = document.getElementById("videoUrl").value;
             if (url) {
                 convertYoutubeToMp3(url);
+                document.getElementById("videoUrl").value = '';
             }
         });
     } else {

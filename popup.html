@@ -21,17 +21,17 @@
             <div class="next-icon"></div>
         </button>
     </div>
+    <div class="progress-container" style="margin-top: 10px;">
+        <input id="progress" type="range" min="0" max="100" value="0" style="width: 100%;">
+        <span id="totalDuration">03:34</span>
+    </div>
     <div class="queue-container">
         <div class="input-container">
             <input type="text" id="videoUrl" placeholder="Paste YouTube link">
             <button id="addSongButton">+</button>
         </div>
-        <button id="queueButton">Show Queue</button>
         <br>
-        <div class="progress-container" style="margin-top: 10px;">
-            <input id="progress" type="range" min="0" max="100" value="0" style="width: 100%;">
-            <span id="totalDuration">03:34</span>
-        </div>
+        <button id="queueButton">Show Queue</button>
         <ul id="queueList"></ul>
     </div>
     <script src="popup.js"></script>

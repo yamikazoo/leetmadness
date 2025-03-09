@@ -5,8 +5,9 @@ body {
     align-items: center;
     width: 220px;
     background-color: #121212;
-    margin: 0;
+    margin: 5px;
     padding: 10px;
+    border-radius: 10px;
     color: white;
     font-family: Arial, sans-serif;
 }
@@ -107,7 +108,7 @@ body {
     font-size: 12px;
     text-align: center;
     margin-bottom: 10px;
-    max-width: 180px;
+    max-width: 150px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -166,10 +167,23 @@ body {
 }
 
 #queueList li {
+    justify-content: space-between;
     padding: 5px;
     background-color: #1e1e1e;
     margin-bottom: 2px;
     cursor: pointer;
+    border-radius: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+#queueList li span {
+    width: calc(100% - 20px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #queueList li:hover {
@@ -177,15 +191,15 @@ body {
 }
 
 .progress-container {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
 }
 
 #currentTime, #totalDuration {
-  font-size: 14px;
-  margin: 0 10px;
+    font-size: 14px;
+    margin: 0 10px;
 }
 
 #progress {
-  width: 100%;
+    width: 100%;
 }
