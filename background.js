@@ -1,5 +1,6 @@
 // background.js
 let audioSource = null;
+let isPlaying = false;
 
 // Setup offscreen document
 async function setupOffscreenDocument() {
@@ -36,10 +37,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       isPlaying = false;
       pauseAudio();
     } else if (request.command === 'next') {
-      // Handle next song logic here
-      console.log('Next song command received');
+        if (typeof initialised === 'undefined') {
+            initialised = true;
+            console.log("Received next command...")
+            chrome.runtime.sendMessage({ command: 'skipToNext' });
+        }
+        initialised = undefined;
     } else if (request.command === 'previous') {
       // Handle previous song logic here
+      // Not implemented; never called.
       console.log('Previous song command received');
     }
   });

@@ -1,9 +1,10 @@
 // popup.js
-const playlist = [
+const defaultPlaylist = [
     { title: "Song 1", artist: "Artist 1", src: "songs/flamin.mp3" },
     { title: "Song 2", artist: "Artist 2", src: "songs/audio.mp3" },
     { title: "Song 3", artist: "Artist 3", src: "songs/moving-on-snoozybeats.mp3" }
 ];
+let playlist = defaultPlaylist;
 let currentIndex = 0;
 let currentlyPlayingSource = null;
 let isPlaying = false;
@@ -110,10 +111,26 @@ function updatePlayButtonIcon() {
     }
 }
 
-document.getElementById("progress").addEventListener("input", function() {
-    const newTime = playlist[currentIndex].duration * (this.value / 100);
-    chrome.runtime.sendMessage({ command: 'seek', time: newTime });
+chrome.runtime.onMessage.addListener((message) => {
+    if (message.progress) {
+        const progressBar = document.getElementById("progress");
+        progressBar.value = message.progress;
+    } else if (message.command === 'skipToNext') {
+        skipToNext();
+    }
 });
+
+document.getElementById("progress").addEventListener("input", function() {
+    const audioPlayer = document.getElementById("audioPlayer");
+
+    if (audioPlayer && playlist[currentIndex].duration) {
+        const newTime = playlist[currentIndex].duration * (this.value / 100);
+        chrome.runtime.sendMessage({ command: 'seek', time: newTime });
+    } else {
+        console.error("Duration not available for the current song.");
+    }
+});
+
 
 async function loadCurrentSongIndex() {
     try {
@@ -193,14 +210,27 @@ async function savePlaylist() {
 function updatePlaybackInfo() {
     const song = playlist[currentIndex];
     const songInfo = document.getElementById("songInfo");
+    const audioPlayer = document.getElementById("audioPlayer");
+
     if (songInfo) {
         songInfo.textContent = `${song.title} - ${song.artist}`;
     } else {
         console.error("Element 'songInfo' not found.");
     }
+
+    if (audioPlayer) {
+        audioPlayer.src = song.src;
+        audioPlayer.load();
+
+        audioPlayer.onloadedmetadata = function () {
+            playlist[currentIndex].duration = audioPlayer.duration;
+            console.log(`Duration set for ${song.title}: ${audioPlayer.duration} seconds`);
+        };
+    }
 }
 
 function skipToNext() {
+    console.log("skipping");
     if (playlist.length === 0) {
         alert("No songs in the queue.");
         return;

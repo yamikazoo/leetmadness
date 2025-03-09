@@ -78,11 +78,19 @@ chrome.runtime.onMessage.addListener((msg) => {
             audio = new Audio(audioUrl);
             initAudio();
             applyEffects();
+            audio.hasEndedListener = false;
         }
         if (audio) {
             audio.play().then(() => {
                 console.log('Audio played successfully');
                 sendProgressUpdates();
+                if (!audio.hasEndedListener) {
+                    audio.addEventListener('ended', () => {
+                        console.log('Sending next command...');
+                        chrome.runtime.sendMessage({ command: 'next' });
+                    });
+                }
+                audio.hasEndedListener = true;
             }).catch(error => {
                 console.error('Error playing audio:', error);
             });
@@ -95,7 +103,7 @@ chrome.runtime.onMessage.addListener((msg) => {
     } else if (msg.command === 'seek') {
         if (audio) {
             audio.currentTime = msg.time;
-            // sendProgressUpdates();
+            sendProgressUpdates();
         }
     }  else if (msg.command === 'makeAudioWorse') {
         // Apply distortion effects
@@ -120,10 +128,5 @@ function sendProgressUpdates() {
         chrome.runtime.sendMessage({ progress: percent });
       }
     }, 1000); // Update every second
-
-    // Clear interval when audio ends
-    audio.addEventListener('ended', () => {
-      clearInterval(intervalId);
-    });
   }
 }
