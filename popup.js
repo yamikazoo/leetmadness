@@ -41,10 +41,14 @@ document.getElementById("addSongButton").addEventListener("click", function() {
 
 document.getElementById("queueButton").addEventListener("click", function () {
     const queueList = document.getElementById("queueList");
+    const queueButton = document.getElementById("queueButton");
+
     if (queueList.style.display === "none" || queueList.style.display === "") {
         queueList.style.display = "block"; // Show the queue
+        queueButton.textContent = "Hide Queue"; // Change button text
     } else {
         queueList.style.display = "none"; // Hide the queue
+        queueButton.textContent = "Show Queue"; // Change button text back
     }
 });
 
