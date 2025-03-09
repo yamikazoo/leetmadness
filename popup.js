@@ -1,77 +1,98 @@
-document.getElementById("playButton").addEventListener("click", async function () {
-    const token = await getSpotifyToken();
-    if (!token) {
-        alert("Please log in to Spotify.");
-        return;
-    }
+// Wait for DOM to load before running script
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("Popup loaded, waiting for user input...");
 
-    const isPlaying = await checkPlaybackState(token);
-    
-    if (isPlaying) {
-        pauseMusic(token);
-    } else {
-        playMusic(token);
-    }
+
+    // Event Listener for Converting YouTube URL to MP3
+    document.getElementById("addSongButton").addEventListener("click", async () => {
+        const youtubeURL = document.getElementById("videoUrl").value;
+        if (!youtubeURL) {
+            alert("Please enter a valid YouTube URL.");
+            return;
+        }
+
+        const audioURL = await convertYouTubeToAudio(youtubeURL);
+    });
+
 });
 
-// Function to check playback state
-async function checkPlaybackState(token) {
-    const response = await fetch("https://api.spotify.com/v1/me/player", {
-        headers: { "Authorization": `Bearer ${token}` }
-    });
-    if (response.status === 200) {
-        const data = await response.json();
-        return data.is_playing;
+/**
+ * YOUTUBETO MP3 CONVERTER
+ */
+async function convertYouTubeToAudio(youtubeURL) {
+    const apiKey = "7b69ef25a8msh370013627f22292p158d22jsn1829a5827683"; // Replace with your API key
+    const videoID = extractYouTubeID(youtubeURL); // Extract video ID dynamically
+
+    if (!videoID) {
+        console.error("Invalid YouTube URL.");
+        alert("Invalid YouTube URL. Please enter a valid link.");
+        return null;
     }
-    return false;
-}
 
-// Function to get Spotify access token (OAuth 2.0 needed)
-async function getSpotifyToken() {
-    const token = localStorage.getItem("spotify_access_token");
-    if (token) return token;
+    const apiURL = `https://youtube-to-mp315.p.rapidapi.com/download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DzyG9Nh_PH38&format=mp3`;
 
-    // TODO: Implement OAuth flow to get token
-    alert("OAuth flow needed to get Spotify token.");
-    return null;
-}
+    try {
+        const response = await fetch(apiURL, {
+            method: "POST",
+            headers: {
+                "X-RapidAPI-Key": apiKey,
+                "X-RapidAPI-Host": "youtube-to-mp315.p.rapidapi.com",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ url: `https://www.youtube.com/watch?v=${videoID}`, format: "mp3" })
+        });
 
-// Function to start playback
-async function playMusic(token) {
-    fetch("https://api.spotify.com/v1/me/player/play", {
-        method: "PUT",
-        headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ uris: ["spotify:track:4uLU6hMCjMI75M1A2tKUQC"] }) // Example track URI
-    }).then(response => {
-        if (response.status === 204) {
-            toggleIcon(true);
-        } else {
-            alert("Failed to play music. Check your Spotify settings.");
+        
+        const data = await response.json();
+        console.log("Raw API Response:", data);
+
+        // ✅ If the API immediately provides the MP3 URL, return it
+        if (data.downloadUrl) {
+            console.log("MP3 file is ready! Download URL:", data.downloadUrl);
+            return data.downloadUrl; // ✅ Return the MP3 file URL immediately
         }
-    });
+
+        console.error("API did not return a download URL.");
+        alert("Failed to get MP3 file. Try again.");
+        return null;
+
+    } catch (error) {
+        console.error("Error fetching YouTube MP3:", error);
+        alert("Failed to convert YouTube video.");
+        return null;
+    }
 }
 
-// Function to pause playback
-async function pauseMusic(token) {
-    fetch("https://api.spotify.com/v1/me/player/pause", {
-        method: "PUT",
-        headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-        }
-    }).then(response => {
-        if (response.status === 204) {
-            toggleIcon(false);
-        } else {
-            alert("Failed to pause music.");
-        }
-    });
+/**
+ * 🔹 Extracts YouTube Video ID from URL
+ */
+function extractYouTubeID(url) {
+    const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    return match ? match[1] : null;
 }
 
-// Function to toggle play/pause icon
+/**
+ * 🎵 Play the MP3 File from API Response
+ */
+async function playMP3(youtubeURL) {
+    const mp3URL = await convertYouTubeToAudio(youtubeURL);
+    if (mp3URL) {
+        const audio = new Audio(mp3URL);
+        audio.play().catch(error => console.error("Playback failed:", error));
+    }
+}
+
+/**
+ * 🔹 Extracts YouTube Video ID from URL
+ */
+function extractYouTubeID(url) {
+    const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    return match ? match[1] : null;
+}
+
+/**
+ * Toggle Play/Pause Icon
+ */
 function toggleIcon(isPlaying) {
     const icon = document.getElementById("icon");
     icon.innerHTML = "";
@@ -81,54 +102,5 @@ function toggleIcon(isPlaying) {
         icon.innerHTML = '<div></div><div></div>'; // Two vertical bars
     } else {
         icon.className = "play-icon";
-    }
-}
-
-
-document.addEventListener("DOMContentLoaded", () => {
-    console.log("Popup loaded, waiting for user input...");
-
-    // ✅ Event Listener for Converting YouTube URL to MP3
-    document.getElementById("convertButton").addEventListener("click", async () => {
-        const youtubeURL = document.getElementById("youtube-url").value;
-        if (!youtubeURL) {
-            alert("Please enter a valid YouTube URL.");
-            return;
-        }
-
-        const audioURL = await convertYouTubeToAudio(youtubeURL);
-        if (audioURL) {
-            localStorage.setItem("leetmadness_audio_url", audioURL);
-            alert("Audio ready! It will distort on failure.");
-        }
-    });
-
-    // ✅ Load saved YouTube audio if available
-    const savedAudio = localStorage.getItem("leetmadness_audio_url");
-    if (savedAudio) {
-        console.log("Loaded saved YouTube audio:", savedAudio);
-    }
-});
-
-/**
- * 🎵 Convert YouTube Video to MP3 using an API
- */
-async function convertYouTubeToAudio(youtubeURL) {
-    const apiKey = "7b69ef25a8msh370013627f22292p158d22jsn1829a5827683"; // Replace with your API Key
-    const apiURL = `https://your-api.com/convert?url=${encodeURIComponent(youtubeURL)}&format=mp3`;
-
-    try {
-        const response = await fetch(apiURL, {
-            headers: { "X-API-Key": apiKey }
-        });
-
-        const data = await response.json();
-        return data.audio_url; // The direct MP3 file link
-    } 
-    
-    catch (error) {
-        console.error("Error converting YouTube video:", error);
-        alert("Failed to convert YouTube video.");
-        return null;
     }
 }
