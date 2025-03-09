@@ -1,6 +1,5 @@
 // Audio context and variables
 let audioContext;
-let audioBuffer;
 let sourceNode;
 let gainNode;
 let filterNode;
@@ -13,25 +12,16 @@ const BASE_PLAYBACK_RATE = 1.0;
 const BASE_FILTER_FREQUENCY = 1000;
 const BASE_GAIN = 1.0;
 
-// Load the MP3 file
-async function loadAudio() {
-    try {
-        const response = await fetch('audio.mp3'); // Path to your audio file
-        if (!response.ok) {
-            throw new Error(`Failed to load audio: ${response.statusText}`);
-        }
-        const arrayBuffer = await response.arrayBuffer();
-        audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-        console.log("Audio loaded successfully!");
-    } catch (error) {
-        console.error("Error loading audio:", error);
-    }
+// Initialize the audio context
+function initAudio() {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    console.log("AudioContext initialized.");
 }
 
-// Play the audio with effects
-function playAudio() {
-    if (!audioBuffer) {
-        console.error("Audio buffer not loaded.");
+// Function to apply effects to the current audio source
+function applyEffects(audioElement) {
+    if (!audioContext) {
+        console.error("AudioContext not initialized.");
         return;
     }
 
@@ -40,9 +30,8 @@ function playAudio() {
         sourceNode.stop();
     }
 
-    // Create a new audio source
-    sourceNode = audioContext.createBufferSource();
-    sourceNode.buffer = audioBuffer;
+    // Create a new audio source from the audio element
+    sourceNode = audioContext.createMediaElementSource(audioElement);
 
     // Create audio nodes for effects
     gainNode = audioContext.createGain();
@@ -70,9 +59,7 @@ function playAudio() {
     filterNode.connect(gainNode);
     gainNode.connect(audioContext.destination);
 
-    // Start playing the audio
-    sourceNode.start();
-    console.log("Audio started playing.");
+    console.log("Audio effects applied to the current song.");
 }
 
 // Function to create a distortion curve
@@ -90,13 +77,13 @@ function makeDistortionCurve(amount) {
 }
 
 // Function to make the audio progressively worse
-function makeAudioWorse() {
+export function makeAudioWorse() {
     incorrectSubmissions++;
     updateAudioEffects();
 }
 
 // Function to make the audio progressively better
-function makeAudioBetter() {
+export function makeAudioBetter() {
     if (incorrectSubmissions === 0) {
         console.log("No incorrect submissions to fix. Audio remains unchanged.");
         return;
@@ -130,33 +117,5 @@ function updateAudioEffects() {
     console.log(`Filter type: ${filterNode.type}`);
 }
 
-// Initialize the audio context and load the MP3 file
-function initAudio() {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    console.log("AudioContext initialized.");
-    loadAudio();
-}
-
 // Initialize audio when the page loads
 initAudio();
-
-// Add event listeners to the buttons
-document.getElementById('playButton').addEventListener('click', () => {
-    // Resume the AudioContext if it's suspended
-    if (audioContext.state === 'suspended') {
-        audioContext.resume().then(() => {
-            console.log("AudioContext resumed.");
-            playAudio();
-        });
-    } else {
-        playAudio();
-    }
-});
-
-document.getElementById('incorrectButton').addEventListener('click', () => {
-    makeAudioWorse();
-});
-
-document.getElementById('correctButton').addEventListener('click', () => {
-    makeAudioBetter();
-});
