@@ -1,6 +1,5 @@
 // background.js
 let audioSource = null;
-let isPlaying = false;
 
 // Setup offscreen document
 async function setupOffscreenDocument() {

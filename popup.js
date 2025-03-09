@@ -1,5 +1,5 @@
 // popup.js
-const defaultPlaylist = [
+const playlist = [
     { title: "Song 1", artist: "Artist 1", src: "songs/flamin.mp3" },
     { title: "Song 2", artist: "Artist 2", src: "songs/audio.mp3" },
     { title: "Song 3", artist: "Artist 3", src: "songs/moving-on-snoozybeats.mp3" }
@@ -43,34 +43,25 @@ document.addEventListener('DOMContentLoaded', async function() {
             updatePlayButtonIcon();
         });
     } else {
-        console.error("Element 'playButton' not found.");
+      console.error("Element 'playButton' not found.");
     }
-
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-      if (request.progress) {
-        const progress = document.getElementById("progress");
-        if (progress) {
-          progress.value = request.progress;
-        }
-      }
-    });
-
+  
     const nextButton = document.getElementById("nextButton");
     if (nextButton) {
-        nextButton.addEventListener("click", function() {
-            skipToNext();
-        });
+      nextButton.addEventListener("click", function () {
+        skipToNext();
+      });
     } else {
-        console.error("Element 'nextButton' not found.");
+      console.error("Element 'nextButton' not found.");
     }
-
+  
     const prevButton = document.getElementById("prevButton");
     if (prevButton) {
-        prevButton.addEventListener("click", function() {
-            skipToPrevious();
-        });
+      prevButton.addEventListener("click", function () {
+        skipToPrevious();
+      });
     } else {
-        console.error("Element 'prevButton' not found.");
+      console.error("Element 'prevButton' not found.");
     }
 
     const addSongButton = document.getElementById("addSongButton");
