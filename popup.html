@@ -27,8 +27,31 @@
             <button id="addSongButton">+</button>
         </div>
         <button id="queueButton">Show Queue</button>
+        <br>
+        <div class="progress-container" style="margin-top: 10px;">
+            <input id="progress" type="range" min="0" max="100" value="0" style="width: 100%;">
+        </div>
         <ul id="queueList"></ul>
     </div>
     <script src="popup.js"></script>
+    <script>
+        const progress = document.getElementById("progress");
+
+        // Update progress bar as the audio plays
+        audio.addEventListener("timeupdate", function() {
+            if (audio.duration) {
+                const percent = (audio.currentTime / audio.duration) * 100;
+                progress.value = percent;
+            }
+        });
+
+        // Allow user to seek by dragging the progress slider
+        progress.addEventListener("input", function() {
+            if (audio.duration) {
+                const newTime = audio.duration * (progress.value / 100);
+                audio.currentTime = newTime;
+            }
+        });
+    </script>
 </body>
 </html>

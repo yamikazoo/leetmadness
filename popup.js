@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 const audio = new Audio();
 const playlist = [
-    { title: "Song 1", artist: "Artist 1", src: "songs/song1.mp3" },
+    { title: "Song 1", artist: "Artist 1", src: "songs/flamin.mp3" },
     { title: "Song 2", artist: "Artist 2", src: "songs/song2.mp3" },
     { title: "Song 3", artist: "Artist 3", src: "songs/song3.mp3" }
 ];
@@ -151,8 +151,6 @@ function updateQueue() {
     });
 }
 
-
-
 async function convertYoutubeToMp3(url) {
     alert(`Processing: ${url}`);
     // Simulating a successful conversion
@@ -162,3 +160,21 @@ async function convertYoutubeToMp3(url) {
         updateQueue();
     }, 2000);
 }
+
+const progress = document.getElementById("progress");
+
+// Update progress bar as the audio plays
+audio.addEventListener("timeupdate", function() {
+    if (audio.duration) {
+        const percent = (audio.currentTime / audio.duration) * 100;
+        progress.value = percent;
+    }
+});
+
+// Allow user to seek by dragging the progress slider
+progress.addEventListener("input", function() {
+    if (audio.duration) {
+        const newTime = audio.duration * (progress.value / 100);
+        audio.currentTime = newTime;
+    }
+});
