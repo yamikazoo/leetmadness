@@ -162,7 +162,7 @@ body {
     padding: 0;
     flex: 1;
     overflow-y: auto;
-}
+    max-height: 180px;}
 
 #queueList li {
     padding: 5px;

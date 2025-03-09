@@ -4,7 +4,9 @@
     "version": "1.0",
     "description": "TODO:",
     "permissions": [
-      "activeTab"
+      "activeTab",
+      "offscreen",
+      "tabs"
     ],
     "background": {
       "service_worker": "background.js"
