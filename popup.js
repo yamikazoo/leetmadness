@@ -1,8 +1,33 @@
 // popup.js
+const defaultPlaylist = [
+    { title: "Song 1", artist: "Artist 1", src: "songs/flamin.mp3" },
+    { title: "Song 2", artist: "Artist 2", src: "songs/song2.mp3" },
+    { title: "Song 3", artist: "Artist 3", src: "songs/song3.mp3" }
+];
+let currentIndex = 0;
 
-document.addEventListener('DOMContentLoaded', function() {
+
+document.addEventListener('DOMContentLoaded', async function() {
+    await loadCurrentSongIndex();
+    await loadPlaylist();
+    await loadQueueState();
     updatePlaybackInfo();
     updateQueue();
+
+    const port = chrome.runtime.connect({ name: 'playbackState' });
+    port.onMessage.addListener((message) => {
+        if (message.isPlaying) {
+            const icon = document.getElementById("icon");
+            icon.className = "pause-icon";
+            icon.innerHTML = '<div></div><div></div>'; 
+        } else {
+            const icon = document.getElementById("icon");
+            icon.className = "play-icon";
+            icon.innerHTML = ''; 
+        }
+    });
+
+    port.postMessage({ request: 'getState' });
 
     const playButton = document.getElementById("playButton");
     if (playButton) {
@@ -21,6 +46,15 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         console.error("Element 'playButton' not found.");
     }
+
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+      if (request.progress) {
+        const progress = document.getElementById("progress");
+        if (progress) {
+          progress.value = request.progress;
+        }
+      }
+    });
 
     const nextButton = document.getElementById("nextButton");
     if (nextButton) {
@@ -54,15 +88,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const queueButton = document.getElementById("queueButton");
     if (queueButton) {
-        queueButton.addEventListener("click", function () {
+        queueButton.addEventListener("click", async function () {
             const queueList = document.getElementById("queueList");
             if (queueList) {
                 if (queueList.style.display === "none" || queueList.style.display === "") {
                     queueList.style.display = "block"; 
-                    queueButton.textContent = "Hide Queue"; 
+                    queueButton.textContent = "Hide Queue";
+                    await saveQueueState(true);
                 } else {
                     queueList.style.display = "none"; 
-                    queueButton.textContent = "Show Queue"; 
+                    queueButton.textContent = "Show Queue";
+                    await saveQueueState(false); 
                 }
             } else {
                 console.error("Element 'queueList' not found.");
@@ -73,12 +109,80 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-const playlist = [
-    { title: "Song 1", artist: "Artist 1", src: "songs/flamin.mp3" },
-    { title: "Song 2", artist: "Artist 2", src: "songs/song2.mp3" },
-    { title: "Song 3", artist: "Artist 3", src: "songs/song3.mp3" }
-];
-let currentIndex = 0;
+async function loadCurrentSongIndex() {
+    try {
+        const result = await chrome.storage.local.get(["currentSongIndex"]);
+        if (result && result.currentSongIndex !== undefined) {
+            currentIndex = result.currentSongIndex;
+        }
+    } catch (error) {
+        console.error("Error loading current song index:", error);
+    }
+}
+
+// Function to save the current song index to storage
+async function saveCurrentSongIndex() {
+    try {
+        await chrome.storage.local.set({ currentSongIndex: currentIndex });
+    } catch (error) {
+        console.error("Error saving current song index:", error);
+    }
+}
+
+// Function to load the queue state from storage
+async function loadQueueState() {
+    try {
+        const result = await chrome.storage.local.get(["showQueue"]);
+        if (result && result.showQueue !== undefined) {
+            if (result.showQueue) {
+                document.getElementById("queueList").style.display = "block";
+                document.getElementById("queueButton").textContent = "Hide Queue";
+            } else {
+                document.getElementById("queueList").style.display = "none";
+                document.getElementById("queueButton").textContent = "Show Queue";
+            }
+        } else {
+            // Default state if none is stored
+            document.getElementById("queueList").style.display = "none";
+            document.getElementById("queueButton").textContent = "Show Queue";
+        }
+    } catch (error) {
+        console.error("Error loading queue state:", error);
+    }
+}
+
+// Function to save the queue state to storage
+async function saveQueueState(show) {
+    try {
+        await chrome.storage.local.set({ showQueue: show });
+    } catch (error) {
+        console.error("Error saving queue state:", error);
+    }
+}
+
+// Function to load the playlist from storage
+async function loadPlaylist() {
+    try {
+        const result = await chrome.storage.local.get(["playlist"]);
+        if (result && result.playlist) {
+            playlist = result.playlist;
+        } else {
+            // Default playlist if none is stored
+            playlist = defaultPlaylist;
+        }
+    } catch (error) {
+        console.error("Error loading playlist:", error);
+    }
+}
+
+// Function to save the playlist to storage
+async function savePlaylist() {
+    try {
+        await chrome.storage.local.set({ playlist: playlist });
+    } catch (error) {
+        console.error("Error saving playlist:", error);
+    }
+}
 
 function updatePlaybackInfo() {
     const song = playlist[currentIndex];
@@ -97,6 +201,8 @@ function skipToNext() {
     }
     currentIndex = (currentIndex + 1) % playlist.length;
     chrome.runtime.sendMessage({ command: 'play', source: playlist[currentIndex].src });
+    updatePlaybackInfo();
+    saveCurrentSongIndex();
 }
 
 function skipToPrevious() {
@@ -106,6 +212,8 @@ function skipToPrevious() {
     }
     currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
     chrome.runtime.sendMessage({ command: 'play', source: playlist[currentIndex].src });
+    updatePlaybackInfo();
+    saveCurrentSongIndex();
 }
 
 function updateQueue() {
@@ -135,7 +243,7 @@ function updateQueue() {
             deleteButton.style.border = "none"; 
             deleteButton.style.backgroundColor = "transparent";
 
-            deleteButton.addEventListener("click", function(event) {
+            deleteButton.addEventListener("click", async function(event) {
                 playlist.splice(index, 1); 
                 updateQueue(); 
                 if (currentIndex >= playlist.length) {
@@ -145,6 +253,8 @@ function updateQueue() {
                     }
                 }
                 updatePlaybackInfo(); 
+                await savePlaylist();
+                await saveCurrentSongIndex();
             });
 
             songText.addEventListener("click", function () {
@@ -168,5 +278,6 @@ async function convertYoutubeToMp3(url) {
         const newSong = { title: "New Song", artist: "Unknown", src: "songs/newsong.mp3" };
         playlist.push(newSong);
         updateQueue();
-    }, 2000);
+        savePlaylist();
+    }, 2000); // TODO: change time if necessary
 }

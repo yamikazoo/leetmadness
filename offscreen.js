@@ -9,6 +9,7 @@ chrome.runtime.onMessage.addListener((msg) => {
     console.log('Playing audio:', audioUrl);
     audio.play().then(() => {
       console.log('Audio played successfully');
+      sendProgressUpdates();
     }).catch(error => {
       console.error('Error playing audio:', error);
     });
@@ -19,3 +20,19 @@ chrome.runtime.onMessage.addListener((msg) => {
     }
   }
 });
+
+function sendProgressUpdates() {
+  if (audio) {
+    const intervalId = setInterval(() => {
+      if (audio.duration && audio.currentTime) {
+        const percent = (audio.currentTime / audio.duration) * 100;
+        chrome.runtime.sendMessage({ progress: percent });
+      }
+    }, 1000); // Update every second
+
+    // Clear interval when audio ends
+    audio.addEventListener('ended', () => {
+      clearInterval(intervalId);
+    });
+  }
+}
